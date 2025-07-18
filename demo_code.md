@@ -40,9 +40,9 @@ if "DASHSCOPE_API_KEY" not in os.environ:
     os.environ["DASHSCOPE_API_KEY"] = getpass.getpass("请输入您的DashScope API Key: ")
 
 # --- 2. 初始化Qwen模型 ---
-# 我们将使用 qwen3-14b 模型作为我们智能体的“大脑”
+# 我们将使用 qwen3-32b 模型作为我们智能体的“大脑”
 try:
-    model = ChatQwen(model="qwen-long", base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
+    model = ChatQwen(model="qwen3-32b", base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",  enable_thinking=False)
     print("Qwen 模型初始化成功！")
 except Exception as e:
     print(f"模型初始化失败，请检查API Key或网络连接: {e}")
