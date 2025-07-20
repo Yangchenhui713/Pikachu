@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上下文工程 (Context Engineering): 权威指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #003f5c;
+            color: #f1f5f9;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .slide-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .slide {
+            background-color: #2f4b7c;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 4rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide-content {
+            text-align: center;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .text-accent-orange { color: #ffa600; }
+        .text-accent-pink { color: #f95d6a; }
+        .bg-accent-orange { background-color: #ffa600; }
+        .bg-accent-pink { background-color: #f95d6a; }
+        .border-accent-blue { border-color: #665191; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 350px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .flow-arrow {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .flow-arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+        }
+
+        .navigation-buttons {
+            position: fixed;
+            bottom: 20px;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            color: #2f4b7c;
+            background-color: #ffa600;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            transform: translateY(-2px);
+            background-color: #ff7c43;
+        }
+        .nav-button:disabled {
+            background-color: #665191;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .slide-indicator {
+            position: fixed;
+            bottom: 70px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .flow-step {
+            background-color: #4b6587;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            color: #f1f5f9;
+            text-align: center;
+        }
+        .flow-connector {
+            font-size: 2rem;
+            color: #f95d6a;
+            margin: 0 1rem;
+        }
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .flow-diagram.horizontal {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .flow-diagram.horizontal .flow-connector {
+            margin: 0;
+            transform: rotate(90deg);
+        }
+        .flow-diagram.horizontal .flow-arrow-right {
+            border-left: 20px solid #f95d6a;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .flow-diagram.vertical .flow-arrow-down {
+            border-top: 20px solid #f95d6a;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+        }
+        .icon-large {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .icon-medium {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .insight-box {
+            background-color: #1a2a4a; /* Darker shade of blue */
+            border-left: 5px solid #ffa600; /* Orange accent */
+            padding: 1rem;
+            margin-top: 1.5rem;
+            text-align: left;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="slide-container">
+        <!-- Slide 1: Title Page -->
+        <div class="slide" id="slide-1">
+            <div class="slide-content">
+                <h1 class="text-5xl md:text-7xl font-black text-white mb-6 animate-fade-in-up">上下文工程</h1>
+                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8 animate-fade-in-up delay-100">从“炼金术”到“化学工程”</h2>
+                <p class="max-w-3xl mx-auto text-slate-300 text-lg animate-fade-in-up delay-200">一份面向AI工程师的权威指南，旨在构建可靠、高效、可扩展的智能体。</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introduction - Why Context? -->
+        <div class="slide hidden" id="slide-2">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-pink mb-6">为什么我们需要关心“上下文”？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-8">
+                    <div class="text-left">
+                        <p class="text-slate-300 text-lg mb-4">您是否曾感觉AI像一个“健忘”的同事？聊了十几轮后，它忘记了最初的目标；处理长文档时，它遗漏了关键的约束条件。</p>
+                        <p class="font-bold text-xl text-slate-100">这些问题的元凶，并非模型不够聪明，而是其核心限制——<strong>上下文窗口 (Context Window)</strong> 的管理不善。</p>
+                    </div>
+                    <div class="text-center">
+                        <span class="icon-large">❓</span>
+                        <p class="mt-4 text-slate-300 font-semibold text-lg">AI的“健忘症”正在耗费我们的时间和金钱。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Core Definition of Context Engineering -->
+        <div class="slide hidden" id="slide-3">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-orange mb-6">核心定义：到底什么是“上下文工程”？</h3>
+                <blockquote class="text-2xl italic text-slate-200 border-l-4 border-accent-pink pl-4 py-2 my-8 mx-auto max-w-3xl">
+                    “上下文工程 (Context Engineering) 是一门‘艺术’与‘科学’，其核心目标是在AI智能体执行任务的每一步中，都有策略地、系统性地构建和管理提供给大语言模型（LLM）的信息输入流（即‘上下文’），以最大化其性能、效率和可靠性。”
+                </blockquote>
+                <p class="text-lg text-slate-300 mt-6">它涉及四个相互关联的阶段：</p>
+                <div class="flow-diagram horizontal text-lg mt-4">
+                    <div class="flow-step">获取 <span class="icon-medium">📥</span><br><span class="text-sm text-slate-400">收集原始数据</span></div>
+                    <div class="flow-arrow-right"></div>
+                    <div class="flow-step">建模 <span class="icon-medium">🏗️</span><br><span class="text-sm text-slate-400">结构化与表示</span></div>
+                    <div class="flow-arrow-right"></div>
+                    <div class="flow-step">推理 <span class="icon-medium">💡</span><br><span class="text-sm text-slate-400">推导更高意义</span></div>
+                    <div class="flow-arrow-right"></div>
+                    <div class="flow-step">适应 <span class="icon-medium">🔄</span><br><span class="text-sm text-slate-400">系统行为改变</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Analogy - Memory Manager -->
+        <div class="slide hidden" id="slide-4">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-pink mb-6">一个更生动的比喻：智能的“内存管理器”</h3>
+                <div class="flex flex-col md:flex-row items-center justify-around gap-6 text-center mt-8">
+                    <div class="flex flex-col items-center">
+                        <span class="icon-large">💾</span>
+                        <h4 class="text-xl font-bold text-white">硬盘 (Hard Drive)</h4>
+                        <p class="text-slate-300">所有信息：对话历史、文档、工具...</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="icon-large">➡️</span>
+                        <p class="text-slate-300 font-semibold">管理与选择</p>
+                    </div>
+                    <div class="flex flex-col items-center p-4 border-4 border-dashed border-accent-blue rounded-lg">
+                        <span class="icon-large">⚙️</span>
+                        <h4 class="text-xl font-bold text-accent-pink">上下文工程</h4>
+                        <p class="text-slate-300">高效的“操作系统”</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="icon-large">➡️</span>
+                        <p class="text-slate-300 font-semibold">有限的输入</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="icon-large">🧠</span>
+                        <h4 class="text-xl font-bold text-white">LLM 上下文窗口 (RAM)</h4>
+                        <p class="text-slate-300">有限、昂贵、易失忆</p>
+                    </div>
+                </div>
+                <p class="text-center mt-8 text-slate-200 text-lg max-w-4xl mx-auto">我们的任务就是扮演高效的“操作系统”，智能地管理信息进出LLM这个有限的“内存”。</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Costs of Neglecting Context Engineering -->
+        <div class="slide hidden" id="slide-5">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-orange mb-6">忽视上下文工程的昂贵代价</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
+                        <span class="icon-medium">💥</span>
+                        <h4 class="text-xl font-bold text-accent-pink mb-2">超出窗口限制</h4>
+                        <p class="text-slate-300">Token总数超限，API报错，任务中断。例如：分析长篇工程招标文件的AI在处理到第80页时，因上下文被占满而无法继续。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
+                        <span class="icon-medium">💸</span>
+                        <h4 class="text-xl font-bold text-accent-pink mb-2">成本与延迟飙升</h4>
+                        <p class="text-slate-300">上下文越大，处理时间越长，API费用越高。例如：在线客服AI每次都发送50轮完整对话历史，导致延迟和账单剧增。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
+                        <span class="icon-medium">📉</span>
+                        <h4 class="text-xl font-bold text-accent-pink mb-2">性能严重下降</h4>
+                        <p class="text-slate-300">“中间遗忘”现象导致AI忽略关键信息。例如：订票时“必须靠窗”的约束被淹没，AI最终预订了过道座位。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Lost in the Middle Chart -->
+        <div class="slide hidden" id="slide-6">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-pink mb-6">“中间遗忘”现象：性能下降的隐患</h3>
+                <p class="text-center font-semibold text-lg text-slate-100 mb-6">研究表明，随着上下文长度增加，模型在处理位于信息“中间”部分时的准确率会显著下降。</p>
+                <div class="chart-container">
+                    <canvas id="lostInTheMiddleChart"></canvas>
+                </div>
+                <p class="text-sm text-slate-400 mt-4">图表显示：随着上下文窗口（Tokens）的增大，模型准确率下降，同时API成本和延迟急剧上升。</p>
+            </div>
+        </div>
+        
+        <!-- Slide 7: AI Agent's Dual-edged Sword: ReAct Cycle -->
+        <div class="slide hidden" id="slide-7">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-orange mb-6">AI智能体的“双刃剑”：自主性与上下文危机</h3>
+                <p class="text-lg text-slate-200 max-w-4xl mx-auto mb-8">AI智能体通过一个“思考 → 行动 → 观察”的ReAct循环来主动完成任务。</p>
+                <div class="flow-diagram vertical text-lg mt-4">
+                    <div class="flow-step">思考 (Reasoning) <span class="icon-medium">🧠</span><br><span class="text-sm text-slate-400">制定下一步计划</span></div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">行动 (Acting) <span class="icon-medium">🚀</span><br><span class="text-sm text-slate-400">调用外部工具</span></div>
+                    <div class="flow-arrow-down"></div>
+                    <div class="flow-step">观察 (Observation) <span class="icon-medium">👁️</span><br><span class="text-sm text-slate-400">获取行动结果</span></div>
+                </div>
+                <p class="text-xl font-bold text-accent-pink mt-8">每一次循环，新的“思考”、“行动”和“观察结果”都会被追加到上下文末尾，导致上下文不可逆地增长，我们称之为“上下文爆炸”。</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Context Crisis - Four Symptoms Overview -->
+        <div class="slide hidden" id="slide-8">
+            <div class="slide-content">
+                <h3 class="text-4xl font-bold text-accent-pink mb-6">上下文危机的四种典型症状</h3>
+                <p class="text-lg text-slate-200 mb-8">如果不加管理，不断膨胀的上下文很快就会变成一场灾难。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-5 flex flex-col items-center text-center">
+                        <span class="icon-medium">☠️</span>
+                        <h5 class="text-xl font-bold text-accent-orange mb-2">中毒 (Poisoning)</h5>
+                        <p class="text-slate-300 text-sm">错误信息污染决策，导致任务走向错误方向。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-5 flex flex-col items-center text-center">
+                        <span class="icon-medium">🤯</span>
+                        <h5 class="text-xl font-bold text-accent-orange mb-2">干扰 (Distraction)</h5>
+                        <p class="text-slate-300 text-sm">无关噪音使模型分心，忽略关键约束。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-5 flex flex-col items-center text-center">
+                        <span class="icon-medium">🧩</span>
+                        <h5 class="text-xl font-bold text-accent-orange mb-2">混淆 (Confusion)</h5>
+                        <p class="text-slate-300 text-sm">技术细节导致输出机械，缺乏人性化。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-5 flex flex-col items-center text-center">
+                        <span class="icon-medium">⚔️</span>
+                        <h5 class="text-xl font-bold text-accent-orange mb-2">冲突 (Clash)</h5>
+                        <p class="text-slate-300 text-sm">矛盾指令导致决策瘫痪或错误选择。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 9: Strategy One: Write -->
+        <div class="slide hidden" id="slide-9">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-orange mb-6">策略一：写入 (Write)</h3>
+                <p class="text-2xl font-bold text-accent-pink mb-4">构建智能体的“外部大脑”，对抗遗忘。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">📝</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">暂存区 (Scratchpad)</h4>
+                        <p class="text-slate-300 text-lg">当前单个任务的“状态追踪器”，记录“正在做什么”和“发现了什么”。</p>
+                        <ul class="list-disc list-inside text-slate-400 text-sm mt-2">
+                            <li>计划分解与当前步骤</li>
+                            <li>中间思考与决策</li>
+                            <li>关键工具调用结果</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">📚</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">记忆 (Memory)</h4>
+                        <p class="text-slate-300 text-lg">跨任务、跨会话的长期“知识库”，让智能体从经验中学习。</p>
+                        <ul class="list-disc list-inside text-slate-400 text-sm mt-2">
+                            <li>用户画像与偏好</li>
+                            <li>可复用解决方案与代码片段</li>
+                            <li>项目复盘与最佳实践</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="insight-box mt-6">
+                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">挑战：</strong>全面性与数据管理（异构性、噪音）及隐私风险的平衡。分布式处理范式（如边缘计算、联邦学习）是克服这些挑战的关键。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Strategy Two: Select -->
+        <div class="slide hidden" id="slide-10">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-orange mb-6">策略二：选择 (Select)</h3>
+                <p class="text-2xl font-bold text-accent-pink mb-4">精准调取信息，实现精准打击，对抗干扰。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">🔍</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">从记忆中选择 (RAG)</h4>
+                        <p class="text-slate-300 text-lg">使用智能体的当前需求作为查询，从庞大的记忆库中搜索最相关的信息片段，为LLM提供精准、即时的指导。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">🛠️</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">工具选择</h4>
+                        <p class="text-slate-300 text-lg">当智能体拥有海量工具时，用RAG的方式，帮它“选择”出当前最可能用到的几个工具，降低模型被“混淆”的概率。</p>
+                    </div>
+                </div>
+                <div class="insight-box mt-6">
+                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">关键洞察：</strong>建模方法存在“复杂性与表达性”的逆向关系，需选择“恰好足够复杂”的范式。建模与推理阶段深度交织，应协同设计。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Strategy Three: Compress -->
+        <div class="slide hidden" id="slide-11">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-orange mb-6">策略三：压缩 (Compress)</h3>
+                <p class="text-2xl font-bold text-accent-pink mb-4">为上下文“瘦身减负”，对抗成本和延迟。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">📝</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">上下文总结</h4>
+                        <p class="text-slate-300 text-lg">使用LLM自身的能力，将一段长文本（如对话历史、网页内容）提炼成一段简短的摘要，用更少的Token承载同样多的核心含义。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">✂️</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">上下文裁剪</h4>
+                        <p class="text-slate-300 text-lg">通过更直接的规则或模型，过滤和“修剪”掉上下文中不那么重要的部分，如丢弃最旧的对话历史或无关的闲聊。</p>
+                    </div>
+                </div>
+                <div class="insight-box mt-6">
+                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">关键洞察：</strong>推理技术存在“透明性与预测能力”的权衡。上下文是动态变化的，推理是一个持续的重新评估和完善过程，需要系统持续监控和主动适应。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Strategy Four: Isolate -->
+        <div class="slide hidden" id="slide-12">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-orange mb-6">策略四：隔离 (Isolate)</h3>
+                <p class="text-2xl font-bold text-accent-pink mb-4">“分而治之”的架构智慧，对抗复杂性。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">👥</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">多智能体架构</h4>
+                        <p class="text-slate-300 text-lg">将一个宏大的任务，分解成多个子任务，交给一个由“管理者”和多个“专家”组成的智能体团队来协同完成，从根本上避免“上下文干扰”和“上下文混淆”。</p>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-left">
+                        <span class="icon-medium">🔒</span>
+                        <h4 class="text-2xl font-bold text-white mb-2">沙盒环境 (Sandboxing)</h4>
+                        <p class="text-slate-300 text-lg">为智能体的某些操作（尤其是代码执行）提供一个隔离的“沙盒”环境。智能体可以把复杂的、状态繁多的工作“外包”给沙盒，自己只关心最终的简洁结果。</p>
+                    </div>
+                </div>
+                <div class="insight-box mt-6">
+                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">关键洞察：</strong>若控制不当，适应可能带来意外风险（如隐私泄露、操纵行为）。系统适应会产生新的上下文信息，形成连续反馈循环，使上下文工程成为动态迭代过程。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Conclusion - Toolkit Review -->
+        <div class="slide hidden" id="slide-13">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-pink mb-6">核心要点回顾：我们的“四件套”工具箱</h3>
+                <p class="text-lg text-slate-200 mb-8">这四大策略共同构成了上下文工程的强大工具箱。</p>
+                <div class="overflow-x-auto bg-slate-800 rounded-xl shadow-lg p-4">
+                    <table class="w-full text-left table-auto">
+                        <thead>
+                            <tr class="border-b-2 border-accent-blue">
+                                <th class="p-3 text-accent-orange text-lg">策略</th>
+                                <th class="p-3 text-white text-lg">做什么</th>
+                                <th class="p-3 text-white text-lg">为什么</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-blue-900">
+                                <td class="p-3 font-bold text-white">写入 (Write)</td>
+                                <td class="p-3 text-slate-300">建立外部大脑</td>
+                                <td class="p-3 text-slate-300">对抗遗忘</td>
+                            </tr>
+                            <tr class="border-b border-blue-900">
+                                <td class="p-3 font-bold text-white">选择 (Select)</td>
+                                <td class="p-3 text-slate-300">精准调取信息</td>
+                                <td class="p-3 text-slate-300">对抗干扰</td>
+                            </tr>
+                            <tr class="border-b border-blue-900">
+                                <td class="p-3 font-bold text-white">压缩 (Compress)</td>
+                                <td class="p-3 text-slate-300">减少Token消耗</td>
+                                <td class="p-3 text-slate-300">对抗成本和延迟</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-white">隔离 (Isolate)</td>
+                                <td class="p-3 text-slate-300">拆分任务与环境</td>
+                                <td class="p-3 text-slate-300">对抗复杂性</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xl font-bold text-slate-100 mt-8">最终目标：将AI应用从“玩具”转变为可靠、可扩展、可维护的强大“工具”。</p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Next Steps & Future Outlook -->
+        <div class="slide hidden" id="slide-14">
+            <div class="slide-content">
+                <h3 class="text-4xl font-black text-accent-orange mb-6">下一步行动与未来展望</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-8">
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 h-full text-left">
+                        <h4 class="text-2xl font-bold text-accent-pink mb-4">我们的下一步行动</h4>
+                        <ul class="space-y-3 list-none p-0 text-slate-300 text-lg">
+                            <li class="flex items-start">
+                                <span class="bg-accent-orange text-white rounded-full w-7 h-7 text-center font-bold mr-3 flex-shrink-0 flex items-center justify-center">1</span>
+                                <div><strong class="text-white">养成“上下文思维”习惯：</strong>设计时主动用四大策略进行安全检查。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-accent-orange text-white rounded-full w-7 h-7 text-center font-bold mr-3 flex-shrink-0 flex items-center justify-center">2</span>
+                                <div><strong class="text-white">从“小实验”开始：</strong>为现有应用增加策略，获得成功经验。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-accent-orange text-white rounded-full w-7 h-7 text-center font-bold mr-3 flex-shrink-0 flex items-center justify-center">3</span>
+                                <div><strong class="text-white">共建团队“模式库”：</strong>分享技巧和架构，加速团队成长。</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl shadow-lg p-6 h-full text-left">
+                        <h4 class="text-2xl font-bold text-accent-pink mb-4">未来展望</h4>
+                        <p class="text-slate-300 text-lg mb-4">超长上下文窗口并非“银弹”，它让成本、延迟和“中间遗忘”问题更突出，因此更需要上下文工程。</p>
+                        <ul class="space-y-2 list-none p-0 text-slate-300 text-lg">
+                            <li class="flex items-start">
+                                <span class="text-accent-orange mr-2">➡️</span>
+                                <div><strong class="text-white">上下文工程的“自动化”：</strong>元智能体动态管理上下文。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-accent-orange mr-2">➡️</span>
+                                <div><strong class="text-white">从“文本”到“结构化上下文”：</strong>实现更精确可靠的控制。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-accent-orange mr-2">➡️</span>
+                                <div><strong class="text-white">预测与主动适应：</strong>系统将预测未来状态并主动调整。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-accent-orange mr-2">➡️</span>
+                                <div><strong class="text-white">多学科领域融合：</strong>与数据治理、伦理AI、安全协议深度结合。</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Final Call to Action/Q&A -->
+        <div class="slide hidden" id="slide-15">
+            <div class="slide-content">
+                <h3 class="text-4xl md:text-5xl font-black text-white mb-6">谢谢大家！</h3>
+                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8">现在是问答环节。</h2>
+                <p class="text-2xl text-slate-300 max-w-3xl mx-auto">上下文工程，是释放大语言模型全部潜力的钥匙。</p>
+                <p class="text-2xl font-bold text-accent-pink mt-4">让我们一起，构建出真正智能、强大的AI应用。</p>
+                <span class="icon-large mt-8">🚀</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation-buttons">
+        <button id="prevBtn" class="nav-button">上一页</button>
+        <button id="nextBtn" class="nav-button">下一页</button>
+    </div>
+    <div class="slide-indicator" id="slideIndicator"></div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideIndicator = document.getElementById('slideIndicator');
+
+        const showSlide = (index) => {
+            slides.forEach((slide, i) => {
+                slide.classList.add('hidden');
+                if (i === index) {
+                    slide.classList.remove('hidden');
+                }
+            });
+            updateNavigationButtons();
+            updateSlideIndicator();
+        };
+
+        const updateNavigationButtons = () => {
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === slides.length - 1;
+        };
+
+        const updateSlideIndicator = () => {
+            slideIndicator.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+        };
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        });
+
+        const wrapLabel = (label, maxLength = 16) => {
+            if (label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            }
+            lines.push(currentLine.trim());
+            return lines.filter(line => line.length > 0);
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            } else {
+              return label;
+            }
+        };
+
+        const chartColors = {
+            blue: '#2f4b7c',
+            purple: '#665191',
+            magenta: '#a05195',
+            pink: '#f95d6a',
+            orange: '#ff7c43',
+            yellow: '#ffa600'
+        };
+
+        const ctxLostInTheMiddle = document.getElementById('lostInTheMiddleChart');
+        if (ctxLostInTheMiddle) {
+            new Chart(ctxLostInTheMiddle, {
+                type: 'line',
+                data: {
+                    labels: ['1k', '4k', '8k', '16k', '32k', '64k', '128k', '256k'],
+                    datasets: [{
+                        label: '模型准确率',
+                        data: [98, 97, 95, 88, 82, 75, 70, 68],
+                        borderColor: chartColors.pink,
+                        backgroundColor: 'rgba(249, 93, 106, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'API成本与延迟',
+                        data: [10, 25, 50, 100, 200, 400, 800, 1600],
+                        borderColor: chartColors.yellow,
+                        backgroundColor: 'rgba(255, 166, 0, 0.1)',
+                        fill: false,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: '上下文窗口大小 (Tokens)', color: '#f1f5f9' },
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(100, 116, 139, 0.2)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: '准确率 (%)', color: chartColors.pink },
+                            ticks: { color: chartColors.pink, callback: value => value + '%' },
+                            min: 60,
+                            max: 100,
+                            grid: { color: 'rgba(100, 116, 139, 0.2)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: '相对成本/延迟', color: chartColors.yellow },
+                            ticks: { color: chartColors.yellow },
+                            grid: { drawOnChartArea: false, },
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f1f5f9' } },
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        showSlide(currentSlideIndex);
+    </script>
+</body>
+</html>
