@@ -190,8 +190,9 @@
         <div class="slide" id="slide-1">
             <div class="slide-content">
                 <h1 class="text-5xl md:text-7xl font-black text-white mb-6 animate-fade-in-up">上下文工程</h1>
-                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8 animate-fade-in-up delay-100">从“炼金术”到“化学工程”</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8 animate-fade-in-up delay-100">从“PROMPT”到“CONTEXT”</h2>
                 <p class="max-w-3xl mx-auto text-slate-300 text-lg animate-fade-in-up delay-200">一份面向AI工程师的权威指南，旨在构建可靠、高效、可扩展的智能体。</p>
+                <p class="max-w-3xl mx-auto text-slate-300 text-lg italic animate-fade-in-up delay-200">技术三部-杨晨辉</p>
             </div>
         </div>
 
@@ -203,6 +204,7 @@
                     <div class="text-left">
                         <p class="text-slate-300 text-lg mb-4">您是否曾感觉AI像一个“健忘”的同事？聊了十几轮后，它忘记了最初的目标；处理长文档时，它遗漏了关键的约束条件。</p>
                         <p class="font-bold text-xl text-slate-100">这些问题的元凶，并非模型不够聪明，而是其核心限制——<strong>上下文窗口 (Context Window)</strong> 的管理不善。</p>
+                        <p class="text-slate-300 text-lg mb-4">上下文窗口 (Context Window) 是大语言模型能够一次性处理的最大信息量。它的大小直接影响模型的表现，过小会导致信息丢失，过大则会增加计算成本和延迟。</p>
                     </div>
                     <div class="text-center">
                         <span class="icon-large">❓</span>
@@ -278,12 +280,12 @@
                     <div class="bg-slate-800 rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
                         <span class="icon-medium">💸</span>
                         <h4 class="text-xl font-bold text-accent-pink mb-2">成本与延迟飙升</h4>
-                        <p class="text-slate-300">上下文越大，处理时间越长，API费用越高。例如：在线客服AI每次都发送50轮完整对话历史，导致延迟和账单剧增。</p>
+                        <p class="text-slate-300">上下文越大，处理时间越长，API费用越高。例如：在线客服AI每次都发送50轮完整对话历史，导致延迟和费用剧增。</p>
                     </div>
                     <div class="bg-slate-800 rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
                         <span class="icon-medium">📉</span>
                         <h4 class="text-xl font-bold text-accent-pink mb-2">性能严重下降</h4>
-                        <p class="text-slate-300">“中间遗忘”现象导致AI忽略关键信息。例如：订票时“必须靠窗”的约束被淹没，AI最终预订了过道座位。</p>
+                        <p class="text-slate-300">“中间遗忘”现象导致AI忽略关键信息。例如：通过AI订票时“必须靠窗”的约束被淹没，AI最终预订了过道座位。</p>
                     </div>
                 </div>
             </div>
@@ -292,7 +294,7 @@
         <!-- Slide 6: Lost in the Middle Chart -->
         <div class="slide hidden" id="slide-6">
             <div class="slide-content">
-                <h3 class="text-4xl font-bold text-accent-pink mb-6">“中间遗忘”现象：性能下降的隐患</h3>
+                <h3 class="text-4xl font-bold text-accent-pink mb-6">“中间遗忘”现象</h3>
                 <p class="text-center font-semibold text-lg text-slate-100 mb-6">研究表明，随着上下文长度增加，模型在处理位于信息“中间”部分时的准确率会显著下降。</p>
                 <div class="chart-container">
                     <canvas id="lostInTheMiddleChart"></canvas>
@@ -375,7 +377,7 @@
                     </div>
                 </div>
                 <div class="insight-box mt-6">
-                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">挑战：</strong>全面性与数据管理（异构性、噪音）及隐私风险的平衡。分布式处理范式（如边缘计算、联邦学习）是克服这些挑战的关键。</p>
+                    <p class="text-slate-300 text-base"><strong class="text-accent-orange">挑战：</strong>全面性与数据管理（异构性、噪音）及隐私风险的平衡。分布式处理范式是克服这些挑战的关键。</p>
                 </div>
             </div>
         </div>
@@ -497,7 +499,7 @@
                 <h3 class="text-4xl font-black text-accent-orange mb-6">下一步行动与未来展望</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-8">
                     <div class="bg-slate-800 rounded-xl shadow-lg p-6 h-full text-left">
-                        <h4 class="text-2xl font-bold text-accent-pink mb-4">我们的下一步行动</h4>
+                        <h4 class="text-2xl font-bold text-accent-pink mb-4">下一步行动</h4>
                         <ul class="space-y-3 list-none p-0 text-slate-300 text-lg">
                             <li class="flex items-start">
                                 <span class="bg-accent-orange text-white rounded-full w-7 h-7 text-center font-bold mr-3 flex-shrink-0 flex items-center justify-center">1</span>
@@ -543,7 +545,7 @@
         <div class="slide hidden" id="slide-15">
             <div class="slide-content">
                 <h3 class="text-4xl md:text-5xl font-black text-white mb-6">谢谢大家！</h3>
-                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8">现在是问答环节。</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-accent-orange mb-8">接下来是演示环节。</h2>
                 <p class="text-2xl text-slate-300 max-w-3xl mx-auto">上下文工程，是释放大语言模型全部潜力的钥匙。</p>
                 <p class="text-2xl font-bold text-accent-pink mt-4">让我们一起，构建出真正智能、强大的AI应用。</p>
                 <span class="icon-large mt-8">🚀</span>
